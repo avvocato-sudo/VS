@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15network_manager.proto\x12\x07network\"!\n\x0eMessageRequest\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x07\n\x05\x45mpty\"\x1d\n\x0cMessageCount\x12\r\n\x05\x63ount\x18\x01 \x01(\x05\x32\x87\x01\n\x0bNodeService\x12\x38\n\rGossipMessage\x12\x17.network.MessageRequest\x1a\x0e.network.Empty\x12>\n\x15GetUniqueMessageCount\x12\x0e.network.Empty\x1a\x15.network.MessageCountb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15network_manager.proto\x12\x07network\"!\n\x0eMessageRequest\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x07\n\x05\x45mpty\"\x1d\n\x0cMessageCount\x12\r\n\x05\x63ount\x18\x01 \x01(\x05\" \n\rGossipRequest\x12\x0f\n\x07message\x18\x01 \x01(\t2\x87\x01\n\x0bNodeService\x12\x38\n\rGossipMessage\x12\x17.network.MessageRequest\x1a\x0e.network.Empty\x12>\n\x15GetUniqueMessageCount\x12\x0e.network.Empty\x1a\x15.network.MessageCountb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -37,6 +37,8 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_EMPTY']._serialized_end=76
   _globals['_MESSAGECOUNT']._serialized_start=78
   _globals['_MESSAGECOUNT']._serialized_end=107
-  _globals['_NODESERVICE']._serialized_start=110
-  _globals['_NODESERVICE']._serialized_end=245
+  _globals['_GOSSIPREQUEST']._serialized_start=109
+  _globals['_GOSSIPREQUEST']._serialized_end=141
+  _globals['_NODESERVICE']._serialized_start=144
+  _globals['_NODESERVICE']._serialized_end=279
 # @@protoc_insertion_point(module_scope)

@@ -16,3 +16,8 @@ message Empty {}
 message MessageCount {
   int32 count = 1;
 }
+
+
+message GossipRequest {
+    string message = 1;
+}
