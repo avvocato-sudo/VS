@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package network;
+
+service NodeService {
+  rpc GossipMessage (MessageRequest) returns (Empty);
+  rpc GetUniqueMessageCount (Empty) returns (MessageCount);
+}
+
+message MessageRequest {
+  string message = 1;
+}
+
+message Empty {}
+
+message MessageCount {
+  int32 count = 1;
+}

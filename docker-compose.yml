@@ -1,0 +1,29 @@
+networks:
+  my_network:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 192.168.1.0/24
+services:
+  node1:
+    build: .
+    environment:
+      NODE_ID: '1'
+    networks:
+      my_network:
+        ipv4_address: 192.168.1.2
+  node2:
+    build: .
+    environment:
+      NODE_ID: '2'
+    networks:
+      my_network:
+        ipv4_address: 192.168.1.3
+  node3:
+    build: .
+    environment:
+      NODE_ID: '3'
+    networks:
+      my_network:
+        ipv4_address: 192.168.1.4
+version: '3.8'
