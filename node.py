@@ -17,10 +17,9 @@ class NodeService(pb2_grpc.NodeServiceServicer):
         self.neighbors = neighbors  # List of neighbor node addresses
 
     def GossipMessage(self, request, context):
+        logging.info(f"Node {self.node_id} received new message: {request.message}")
         if request.message not in self.unique_messages:
-            logging.info(f"Node {self.node_id} received new message: {request.message}")
             self.unique_messages.add(request.message)
-
             # Forward the message to neighbors
             for neighbor in self.neighbors:
                 try:
@@ -37,16 +36,30 @@ class NodeService(pb2_grpc.NodeServiceServicer):
         return pb2.MessageCount(count=count)
 
 
-def send_periodic_messages(stub, node_id):
-    """Send periodic gRPC messages every 5 seconds."""
+def send_periodic_messages(address, node_id, message):
+    stub = connect_with_retries(address)
+    if not stub:
+        logging.error(f"Could not establish connection to {address}")
+        return
     while True:
-        message = f"Hello from Node {node_id}"
         try:
-            logging.info(f"Node {node_id} sending message: {message}")
+            logging.info(f"Node {node_id} sending message: {message} to {address}")
             stub.GossipMessage(pb2.MessageRequest(message=message))
         except Exception as e:
-            logging.error(f"Error sending message: {e}")
+            logging.error(f"Error sending message to {address}: {e}")
         time.sleep(5)
+
+def connect_with_retries(address, retries=5, delay=2):
+    for attempt in range(retries):
+        try:
+            channel = grpc.insecure_channel(address)
+            grpc.channel_ready_future(channel).result(timeout=5)
+            return pb2_grpc.NodeServiceStub(channel)
+        except grpc.FutureTimeoutError:
+            logging.warning(f"Retrying connection to {address} (attempt {attempt + 1})...")
+            time.sleep(delay)
+    logging.error(f"Failed to connect to {address} after {retries} attempts.")
+    return None
 
 
 def serve():
@@ -55,21 +68,26 @@ def serve():
     neighbors_env = os.getenv("NEIGHBORS", "")
     neighbors = neighbors_env.split(",") if neighbors_env else []
 
+    logging.info(f"Node {node_id} listening on port {port} with neighbors: {neighbors}")
+
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     pb2_grpc.add_NodeServiceServicer_to_server(NodeService(node_id, neighbors), server)
     server.add_insecure_port(f"[::]:{port}")
-    logging.info(f"Node {node_id} started on port {port} with neighbors: {neighbors}")
+    logging.info(f"Node {node_id} started on port {port}.")
     server.start()
 
-    # Create stubs for each neighbor
-    stubs = [pb2_grpc.NodeServiceStub(grpc.insecure_channel(neighbor)) for neighbor in neighbors]
+    # Wait for all nodes to initialize
+    time.sleep(5)
 
-    # Start periodic message-sending threads for each neighbor
-    for stub in stubs:
-        threading.Thread(target=send_periodic_messages, args=(stub, node_id), daemon=True).start()
+    # Start periodic messaging threads
+    for neighbor in neighbors:
+        threading.Thread(
+            target=send_periodic_messages,
+            args=(neighbor, node_id, f"Hello from Node {node_id}"),
+            daemon=True,
+        ).start()
 
     server.wait_for_termination()
-
 
 if __name__ == "__main__":
     serve()

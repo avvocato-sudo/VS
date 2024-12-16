@@ -47,7 +47,7 @@ def generate_docker_compose(node_count, topology_type):
     for node_id in range(node_count):
         # Get neighbors from the graph
         neighbors = [
-            f"192.168.1.{neighbor + 2}:50050{+ neighbor + 2}" for neighbor in graph.neighbors(node_id)
+            f"192.168.1.{neighbor+2}:{50050+ neighbor+2}" for neighbor in graph.neighbors(node_id)
         ]
 
         service_name = f"node{node_id}"
@@ -55,7 +55,7 @@ def generate_docker_compose(node_count, topology_type):
             "build": ".",
             "environment": {
                 "NODE_ID": str(node_id),
-                "NODE_PORT": f"50050{+ node_id + 2}",
+                "NODE_PORT": 50050 + node_id+2,
                 "NEIGHBORS": ",".join(neighbors),
             },
             "networks": {
