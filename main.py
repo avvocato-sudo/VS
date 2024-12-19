@@ -19,6 +19,17 @@ def generate_topology(num_nodes, topology_type):
         return nx.complete_graph(num_nodes)
     elif topology_type == "random":
         return nx.gnp_random_graph(num_nodes, 0.5)  # 50% chance of edge creation
+    elif topology_type == "star":
+        return nx.star_graph(num_nodes - 1)
+    elif topology_type == "bus":
+        # A line topology can represent a bus topology
+        return nx.path_graph(num_nodes)
+    elif topology_type == "tree":
+        # Binary tree for simplicity
+        return nx.balanced_tree(r=2, h=int((num_nodes - 1).bit_length()))
+    elif topology_type == "half_mesh":
+        # A mesh-like structure with approximately 50% connectivity
+        return nx.gnp_random_graph(num_nodes, 0.5)
     else:
         raise ValueError("Unsupported topology type")
 
@@ -81,8 +92,10 @@ def main():
         if node_count < 1:
             raise ValueError("Number of nodes must be at least 1.")
 
-        topology_type = input("Enter the topology type (ring, fully_connected, random): ").strip()
-        if topology_type not in {"ring", "fully_connected", "random"}:
+        topology_type = input(
+            "Enter the topology type (ring, fully_connected, random, star, bus, tree, half_mesh): "
+        ).strip()
+        if topology_type not in {"ring", "fully_connected", "random", "star", "bus", "tree", "half_mesh"}:
             raise ValueError("Unsupported topology type.")
 
         generate_docker_compose(node_count, topology_type)
